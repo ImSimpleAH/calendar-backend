@@ -4,8 +4,10 @@ import os
 import json
 import requests
 
-app.debug = True
+
 app = Flask(__name__)
+
+app.debug = True
 CORS(app, supports_credentials=True)
 app.secret_key = os.environ.get("SESSION_SECRET", "changeme")
 
