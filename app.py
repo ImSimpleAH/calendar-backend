@@ -46,6 +46,34 @@ def add_event():
     except Exception as e:
         print("Error saving event:", e)
         return jsonify({"error": "Failed to save event."}), 500
+        
+@app.route('/events', methods=['GET', 'POST', 'OPTIONS'])
+def events():
+    if request.method == 'OPTIONS':
+        return '', 200
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            with open(events_file, 'r+') as f:
+                try:
+                    events = json.load(f)
+                except json.JSONDecodeError:
+                    events = []
+                events.append(data)
+                f.seek(0)
+                json.dump(events, f, indent=2)
+            return jsonify({"message": "Event added"}), 201
+        except Exception as e:
+            print("Error saving event:", e)
+            return jsonify({"error": "Failed to save event."}), 500
+    else:
+        try:
+            with open(events_file, 'r') as f:
+                events = json.load(f)
+        except Exception:
+            events = []
+        return jsonify(events)
+
 
 # Bind to 0.0.0.0 and port from Render
 if __name__ == '__main__':
