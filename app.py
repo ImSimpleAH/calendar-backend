@@ -4,8 +4,12 @@ import os
 import json
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "super-secret-key")
+app.config.update(
+    SESSION_COOKIE_SAMESITE='None',
+    SESSION_COOKIE_SECURE=True
+)
 CORS(app, supports_credentials=True)
-app.secret_key = os.environ.get("SESSION_SECRET", "changeme")
 
 events_file = 'events.json'
 users_file = 'users.json'
@@ -25,7 +29,7 @@ def register():
     data = request.json
     username = data.get("username")
     password = data.get("password")
-    
+
     if not username or not password:
         return jsonify({"error": "Username and password required."}), 400
 
@@ -37,7 +41,7 @@ def register():
         users.append({"username": username, "password": password})
         f.seek(0)
         json.dump(users, f, indent=2)
-    
+
     return jsonify({"message": "User registered."})
 
 @app.route("/login", methods=["POST"])
