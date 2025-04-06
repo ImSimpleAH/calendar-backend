@@ -9,6 +9,8 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='None',
     SESSION_COOKIE_SECURE=True
 )
+app.secret_key = os.environ.get("SESSION_SECRET", "super-secret-key")
+
 CORS(app, supports_credentials=True)
 
 events_file = 'events.json'
@@ -46,6 +48,7 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
+    credentials: 'include'
     data = request.json
     username = data.get("username")
     password = data.get("password")
@@ -61,11 +64,13 @@ def login():
 
 @app.route("/logout")
 def logout():
+    credentials: 'include'
     session.clear()
     return jsonify({"message": "Logged out."})
 
 @app.route("/me")
 def get_user():
+    credentials: 'include'
     if "user" in session:
         return jsonify({"logged_in": True, "username": session["user"]})
     return jsonify({"logged_in": False})
